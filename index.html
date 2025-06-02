@@ -131,11 +131,12 @@
       }
     }
 
-    claveInput.addEventListener("input", () => {
-      if (!validarPasajero()) {
-        alert("RUT o Clave Personal incorrectos.");
-      }
-    });
+    claveInput.addEventListener("blur", () => {
+  if (claveInput.value.trim().length > 0 && !validarPasajero()) {
+    alert("RUT o Clave Personal incorrectos.");
+  }
+});
+
 
     form.addEventListener("submit", function (e) {
       e.preventDefault();
