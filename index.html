@@ -129,19 +129,22 @@
     { rut: '111111114', clave: 'MariaL3', nombre: 'María López' }         // RUT válido ejemplo
   ];
 
-  // Función para validar RUT chileno (sin puntos ni guion)
   function validarRut(rut) {
     if (!/^\d{7,8}[0-9kK]{1}$/.test(rut)) return false; 
     let cuerpo = rut.slice(0, -1);
     let dv = rut.slice(-1).toLowerCase();
+
     let suma = 0;
     let multiplo = 2;
     for (let i = cuerpo.length - 1; i >= 0; i--) {
-      suma += parseInt(cuerpo.charAt(i)) * multiplo;
+      suma += parseInt(cuerpo.charAt(i), 10) * multiplo;
       multiplo = multiplo < 7 ? multiplo + 1 : 2;
     }
     let dvEsperado = 11 - (suma % 11);
-    dvEsperado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'k' : dvEsperado.toString();
+    if (dvEsperado === 11) dvEsperado = '0';
+    else if (dvEsperado === 10) dvEsperado = 'k';
+    else dvEsperado = dvEsperado.toString();
+
     return dv === dvEsperado;
   }
 
@@ -168,7 +171,6 @@
       return false;
     }
 
-    // Buscar pasajero con ese RUT
     const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut);
 
     if (!pasajero) {
@@ -181,15 +183,12 @@
       return false;
     }
 
-    // Si todo bien, llenar nombre automáticamente
     nombreInput.value = pasajero.nombre;
     return true;
   }
 
-  // Validar y llenar nombre cuando se termina de ingresar clave
   claveInput.addEventListener('input', validarDatos);
 
-  // También validar cuando se cambia RUT
   rutInput.addEventListener('input', () => {
     nombreInput.value = '';
     limpiarErrores();
@@ -202,24 +201,18 @@
       return;
     }
 
-    // Datos para enviar mensaje WhatsApp
     const nombre = nombreInput.value;
     const telefono = document.getElementById('telefono').value.trim();
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
     const conductorTelefono = document.getElementById('conductor').value;
 
-    if (!telefono || !origen || !destino || !conductorTelefono) {
-      alert('Por favor completa todos los campos.');
-      return;
-    }
-
-    const mensaje = 
-      `Hola, soy ${nombre}.%0A` +
-      `Quiero solicitar un viaje desde: ${origen}%0A` +
-      `Hasta: ${destino}%0A` +
-      `Mi teléfono de contacto es: ${telefono}%0A` +
-      `Por favor confirma tu disponibilidad. ¡Gracias!`;
+    const mensaje = encodeURIComponent(
+      `Hola, soy ${nombre}.\n` +
+      `Solicito un viaje desde: ${origen}\n` +
+      `Hasta: ${destino}\n` +
+      `Por favor confirmar disponibilidad. Gracias.`
+    );
 
     const urlWhatsApp = `https://wa.me/${conductorTelefono}?text=${mensaje}`;
     window.open(urlWhatsApp, '_blank');
