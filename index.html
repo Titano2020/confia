@@ -8,137 +8,167 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      max-width: 600px;
-      margin: auto;
+      background: #f4f4f4;
     }
-    h2, h3 {
-      text-align: center;
+    h1, h2 {
+      color: #333;
     }
-    input, select, button {
-      display: block;
-      margin: 10px 0;
-      padding: 10px;
-      width: 100%;
-      font-size: 16px;
-    }
-    .error {
-      color: red;
-      font-weight: bold;
-    }
-    .conductores {
-      background-color: #f2f2f2;
-      padding: 15px;
-      margin-bottom: 25px;
+    form {
+      background: white;
+      padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      max-width: 500px;
+      margin: 0 auto;
     }
-    .conductores p {
-      margin: 5px 0;
-      font-size: 18px;
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .conductor {
+      background: #fff;
+      margin: 10px auto;
+      padding: 10px;
+      border-radius: 8px;
+      max-width: 500px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
 
-<h2>Conductores Disponibles</h2>
-<div class="conductores">
-  <p><strong>🚘 Carlos Soto</strong> - Zona Norte</p>
-  <p><strong>🚘 Lucía Herrera</strong> - Zona Centro</p>
-</div>
+  <h1>Solicita tu viaje</h1>
 
-<h3>Formulario de Solicitud de Viaje</h3>
+  <section id="conductores">
+    <h2>Conductores disponibles</h2>
+    <div class="conductor">
+      <h3>Cristián González</h3>
+      <p>Conductor de confianza, responsable y puntual.</p>
+    </div>
+    <div class="conductor">
+      <h3>Camila Soto</h3>
+      <p>Viajes tranquilos y servicio amable.</p>
+    </div>
+    <div class="conductor">
+      <h3>Pedro Ramírez</h3>
+      <p>Conductor profesional con experiencia.</p>
+    </div>
+  </section>
 
-<form id="formularioViaje">
-  <label for="rut">RUT (sin puntos ni guion):</label>
-  <input type="text" id="rut" name="rut" required />
+  <form id="viajeForm">
+    <label for="rut">RUT (sin puntos ni guion):</label>
+    <input type="text" id="rut" name="rut" required />
 
-  <label for="clave">Clave Personal:</label>
-  <input type="password" id="clave" name="clave" required />
+    <label for="clave">Clave Personal:</label>
+    <input type="text" id="clave" name="clave" required />
 
-  <div class="error" id="errorMensaje"></div>
+    <label for="nombre">Nombre del pasajero:</label>
+    <input type="text" id="nombre" name="nombre" readonly />
 
-  <label for="nombre">Nombre del pasajero:</label>
-  <input type="text" id="nombre" name="nombre" readonly />
+    <label for="origen">Origen del viaje:</label>
+    <input type="text" id="origen" name="origen" required />
 
-  <label for="origen">Origen del viaje:</label>
-  <input type="text" id="origen" name="origen" required />
+    <label for="destino">Destino del viaje:</label>
+    <input type="text" id="destino" name="destino" required />
 
-  <label for="destino">Destino del viaje:</label>
-  <input type="text" id="destino" name="destino" required />
+    <label for="fecha">Fecha del viaje:</label>
+    <input type="date" id="fecha" name="fecha" required />
 
-  <label for="fecha">Fecha del viaje:</label>
-  <input type="date" id="fecha" name="fecha" required />
+    <label for="hora">Hora del viaje (24 hrs):</label>
+    <input type="time" id="hora" name="hora" required />
 
-  <label for="hora">Hora del viaje (formato 24 hrs):</label>
-  <input type="time" id="hora" name="hora" required />
+    <label for="conductor">Elige tu conductor:</label>
+    <select id="conductor" name="conductor" required>
+      <option value="">-- Selecciona un conductor --</option>
+      <option value="Cristián González">Cristián González</option>
+      <option value="Camila Soto">Camila Soto</option>
+      <option value="Pedro Ramírez">Pedro Ramírez</option>
+    </select>
 
-  <label for="conductor">Selecciona tu conductor:</label>
-  <select id="conductor" name="conductor" required>
-    <option value="">-- Elige un conductor --</option>
-    <option value="Carlos Soto">Carlos Soto</option>
-    <option value="Lucía Herrera">Lucía Herrera</option>
-  </select>
+    <button type="submit">Enviar solicitud</button>
+  </form>
 
-  <button type="submit">Solicitar Viaje</button>
-</form>
+  <script>
+    const pasajeros = {
+      "123456785": { clave: "ClaveUno", nombre: "Juan Pérez" },
+      "987654321": { clave: "ClaveDos", nombre: "María López" },
+      "111111111": { clave: "ClaveTres", nombre: "Carlos Ruiz" }
+    };
 
-<script>
-  // Pasajeros registrados (RUT sin puntos ni guion)
-  const pasajeros = {
-    "123456789": { nombre: "María López", clave: "Clave123" },
-    "987654321": { nombre: "Carlos Pérez", clave: "Clave456" },
-    "111222333": { nombre: "Ana Torres", clave: "Clave789" }
-  };
+    const rutInput = document.getElementById("rut");
+    const claveInput = document.getElementById("clave");
+    const nombreInput = document.getElementById("nombre");
+    const form = document.getElementById("viajeForm");
 
-  const rutInput = document.getElementById("rut");
-  const claveInput = document.getElementById("clave");
-  const nombreInput = document.getElementById("nombre");
-  const errorMensaje = document.getElementById("errorMensaje");
+    function validarPasajero() {
+      const rut = rutInput.value.trim();
+      const clave = claveInput.value.trim();
 
-  function validarPasajero() {
-    const rut = rutInput.value.trim();
-    const clave = claveInput.value.trim();
-    if (rut in pasajeros && pasajeros[rut].clave === clave) {
-      nombreInput.value = pasajeros[rut].nombre;
-      errorMensaje.textContent = "";
-      return true;
-    } else {
-      nombreInput.value = "";
-      errorMensaje.textContent = "RUT o Clave Personal incorrecta.";
-      return false;
-    }
-  }
-
-  rutInput.addEventListener("blur", () => {
-    if (claveInput.value) validarPasajero();
-  });
-
-  claveInput.addEventListener("input", () => {
-    validarPasajero();
-  });
-
-  document.getElementById("formularioViaje").addEventListener("submit", function (e) {
-    e.preventDefault();
-
-    if (!validarPasajero()) {
-      alert("Verifica el RUT y la Clave Personal antes de continuar.");
-      return;
+      if (pasajeros[rut] && pasajeros[rut].clave === clave) {
+        nombreInput.value = pasajeros[rut].nombre;
+        return true;
+      } else {
+        nombreInput.value = "";
+        return false;
+      }
     }
 
-    const mensaje = `
-🚖 Nueva solicitud de viaje
-📌 Nombre del pasajero: ${nombreInput.value}
-🆔 RUT: ${rutInput.value}
-📍 Origen: ${document.getElementById("origen").value}
-📍 Destino: ${document.getElementById("destino").value}
-📅 Fecha: ${document.getElementById("fecha").value}
-🕒 Hora: ${document.getElementById("hora").value}
-👨‍✈️ Conductor elegido: ${document.getElementById("conductor").value}
-    `.trim();
+    claveInput.addEventListener("input", () => {
+      if (!validarPasajero()) {
+        alert("RUT o Clave Personal incorrectos.");
+      }
+    });
 
-    alert("Mensaje para el conductor:\n\n" + mensaje);
-  });
-</script>
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!validarPasajero()) {
+        alert("Datos inválidos. No se enviará la solicitud.");
+        return;
+      }
+
+      const datos = {
+        rut: rutInput.value,
+        nombre: nombreInput.value,
+        origen: form.origen.value,
+        destino: form.destino.value,
+        fecha: form.fecha.value,
+        hora: form.hora.value,
+        conductor: form.conductor.value
+      };
+
+      const mensaje = `Nueva solicitud de viaje:
+Nombre del pasajero: ${datos.nombre}
+RUT: ${datos.rut}
+Origen: ${datos.origen}
+Destino: ${datos.destino}
+Fecha: ${datos.fecha}
+Hora: ${datos.hora}
+Conductor elegido: ${datos.conductor}`;
+
+      console.log(mensaje); // Reemplazar con integración de mensajería real
+
+      alert("Solicitud enviada con éxito.");
+      form.reset();
+    });
+  </script>
 
 </body>
 </html>
