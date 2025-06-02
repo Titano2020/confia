@@ -105,6 +105,9 @@
     <option value="56987654321">María López</option>
   </select>
 
+  <label for="codigo">Código de pasajero:</label>
+  <input type="text" id="codigo" name="codigo" placeholder="Ingresa tu código" required />
+
   <button type="submit">Enviar solicitud por WhatsApp</button>
 </form>
 
@@ -117,9 +120,17 @@
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
     const conductorTelefono = document.getElementById('conductor').value;
+    const codigoIngresado = document.getElementById('codigo').value.trim();
 
-    if (!nombre || !telefono || !origen || !destino || !conductorTelefono) {
+    const codigoCorrecto = "CONFIA2025";  // Cambia este código cuando quieras
+
+    if (!nombre || !telefono || !origen || !destino || !conductorTelefono || !codigoIngresado) {
       alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    if (codigoIngresado !== codigoCorrecto) {
+      alert('Código incorrecto. Si no tienes un código, contacta al conductor.');
       return;
     }
 
