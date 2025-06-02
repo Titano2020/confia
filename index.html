@@ -2,83 +2,99 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Solicitud de Viaje</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Solicitud de Viaje Seguro</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 20px;
+      margin: 20px;
       background: #f4f4f4;
     }
-    h1, h2 {
+    h1 {
+      text-align: center;
       color: #333;
     }
     form {
-      background: white;
+      background: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      max-width: 500px;
+      max-width: 480px;
       margin: 0 auto;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     label {
       display: block;
-      margin-top: 10px;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #555;
     }
     input, select {
       width: 100%;
       padding: 8px;
-      margin-top: 5px;
+      margin-top: 6px;
       box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
     }
     button {
-      margin-top: 15px;
-      padding: 10px;
-      background: #4CAF50;
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      font-size: 16px;
+      background-color: #0078d7;
       color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       cursor: pointer;
     }
     button:hover {
-      background: #45a049;
+      background-color: #005fa3;
     }
-    .conductor {
+    .conductores {
+      max-width: 480px;
+      margin: 20px auto;
       background: #fff;
-      margin: 10px auto;
-      padding: 10px;
+      padding: 15px;
       border-radius: 8px;
-      max-width: 500px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      color: #333;
+    }
+    .conductores h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .conductores ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .conductores li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
     }
   </style>
 </head>
 <body>
 
-  <h1>Solicita tu viaje</h1>
+  <h1>Solicitud de Viaje Seguro</h1>
 
-  <section id="conductores">
+  <div class="conductores">
     <h2>Conductores disponibles</h2>
-    <div class="conductor">
-      <h3>Cristián González</h3>
-      <p>Conductor de confianza, responsable y puntual.</p>
-    </div>
-    <div class="conductor">
-      <h3>Camila Soto</h3>
-      <p>Viajes tranquilos y servicio amable.</p>
-    </div>
-    <div class="conductor">
-      <h3>Pedro Ramírez</h3>
-      <p>Conductor profesional con experiencia.</p>
-    </div>
-  </section>
+    <ul>
+      <li>Cristián González</li>
+      <li>María López</li>
+      <li>Javier Fernández</li>
+      <li>Carolina Méndez</li>
+      <li>Andrés Rojas</li>
+    </ul>
+  </div>
 
   <form id="viajeForm">
     <label for="rut">RUT (sin puntos ni guion):</label>
-    <input type="text" id="rut" name="rut" required />
+    <input type="text" id="rut" name="rut" maxlength="9" required />
 
     <label for="clave">Clave Personal:</label>
-    <input type="text" id="clave" name="clave" required />
+    <input type="password" id="clave" name="clave" required />
 
     <label for="nombre">Nombre del pasajero:</label>
     <input type="text" id="nombre" name="nombre" readonly />
@@ -92,38 +108,54 @@
     <label for="fecha">Fecha del viaje:</label>
     <input type="date" id="fecha" name="fecha" required />
 
-    <label for="hora">Hora del viaje (24 hrs):</label>
+    <label for="hora">Hora del viaje (24 horas):</label>
     <input type="time" id="hora" name="hora" required />
 
-    <label for="conductor">Elige tu conductor:</label>
+    <label for="conductor">Elegir conductor:</label>
     <select id="conductor" name="conductor" required>
-      <option value="">-- Selecciona un conductor --</option>
+      <option value="">--Seleccione un conductor--</option>
       <option value="Cristián González">Cristián González</option>
-      <option value="Camila Soto">Camila Soto</option>
-      <option value="Pedro Ramírez">Pedro Ramírez</option>
+      <option value="María López">María López</option>
+      <option value="Javier Fernández">Javier Fernández</option>
+      <option value="Carolina Méndez">Carolina Méndez</option>
+      <option value="Andrés Rojas">Andrés Rojas</option>
     </select>
 
-    <button type="submit">Enviar solicitud</button>
+    <button type="submit">Enviar Solicitud</button>
   </form>
 
   <script>
-    const pasajeros = {
-      "123456785": { clave: "ClaveUno", nombre: "Juan Pérez" },
-      "987654321": { clave: "ClaveDos", nombre: "María López" },
-      "111111111": { clave: "ClaveTres", nombre: "Carlos Ruiz" }
-    };
+    const pasajeros = [
+      { rut: "123456785", clave: "Clave123", nombre: "Juan Pérez" },
+      { rut: "987654321", clave: "Segura1", nombre: "Ana Gómez" },
+      { rut: "112233445", clave: "MiClave9", nombre: "Luis Martínez" },
+      { rut: "556677889", clave: "Clave999", nombre: "Carla Díaz" }
+    ];
 
     const rutInput = document.getElementById("rut");
     const claveInput = document.getElementById("clave");
     const nombreInput = document.getElementById("nombre");
     const form = document.getElementById("viajeForm");
 
+    // Al cambiar el RUT, buscar pasajero y llenar nombre si clave es correcta
+    rutInput.addEventListener("input", () => {
+      nombreInput.value = ""; // Limpiar nombre para nueva búsqueda
+    });
+
+    claveInput.addEventListener("input", () => {
+      // Vaciar nombre mientras escriben clave
+      nombreInput.value = "";
+    });
+
+    // Al salir de clave o rut, intentar autocompletar el nombre
     function validarPasajero() {
       const rut = rutInput.value.trim();
       const clave = claveInput.value.trim();
-
-      if (pasajeros[rut] && pasajeros[rut].clave === clave) {
-        nombreInput.value = pasajeros[rut].nombre;
+      const pasajero = pasajeros.find(
+        p => p.rut === rut && p.clave === clave
+      );
+      if (pasajero) {
+        nombreInput.value = pasajero.nombre;
         return true;
       } else {
         nombreInput.value = "";
@@ -131,43 +163,43 @@
       }
     }
 
-    claveInput.addEventListener("blur", () => {
-  if (claveInput.value.trim().length > 0 && !validarPasajero()) {
-    alert("RUT o Clave Personal incorrectos.");
-  }
-});
+    rutInput.addEventListener("blur", validarPasajero);
+    claveInput.addEventListener("blur", validarPasajero);
 
-
-    form.addEventListener("submit", function (e) {
+    form.addEventListener("submit", (e) => {
       e.preventDefault();
       if (!validarPasajero()) {
-        alert("Datos inválidos. No se enviará la solicitud.");
+        alert("RUT o Clave Personal incorrectos. No se enviará la solicitud.");
         return;
       }
 
+      // Aquí puedes manejar el envío del formulario, por ejemplo:
       const datos = {
-        rut: rutInput.value,
-        nombre: nombreInput.value,
-        origen: form.origen.value,
-        destino: form.destino.value,
-        fecha: form.fecha.value,
-        hora: form.hora.value,
-        conductor: form.conductor.value
+        rut: rutInput.value.trim(),
+        nombre: nombreInput.value.trim(),
+        clave: claveInput.value.trim(),
+        origen: document.getElementById("origen").value.trim(),
+        destino: document.getElementById("destino").value.trim(),
+        fecha: document.getElementById("fecha").value,
+        hora: document.getElementById("hora").value,
+        conductor: document.getElementById("conductor").value
       };
 
-      const mensaje = `Nueva solicitud de viaje:
-Nombre del pasajero: ${datos.nombre}
-RUT: ${datos.rut}
-Origen: ${datos.origen}
-Destino: ${datos.destino}
-Fecha: ${datos.fecha}
-Hora: ${datos.hora}
-Conductor elegido: ${datos.conductor}`;
+      // Enviar datos por fetch, XMLHttpRequest o abrir WhatsApp, etc.
+      // Por ahora solo muestro confirmación:
+      alert(
+        `Solicitud enviada:\n` +
+        `Nombre del pasajero: ${datos.nombre}\n` +
+        `RUT: ${datos.rut}\n` +
+        `Origen: ${datos.origen}\n` +
+        `Destino: ${datos.destino}\n` +
+        `Fecha: ${datos.fecha}\n` +
+        `Hora: ${datos.hora}\n` +
+        `Conductor: ${datos.conductor}`
+      );
 
-      console.log(mensaje); // Reemplazar con integración de mensajería real
-
-      alert("Solicitud enviada con éxito.");
       form.reset();
+      nombreInput.value = "";
     });
   </script>
 
