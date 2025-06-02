@@ -1,134 +1,295 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Solicitud de Viaje</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Confía - Solicita tu viaje</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: auto;
+    padding: 10px;
+    background: #f2f2f2;
+  }
+  h1, h2 {
+    text-align: center;
+    color: #004080;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    background-color: #004080;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #003060;
+  }
+  .conductores {
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .conductor-item {
+    margin-bottom: 10px;
+  }
+  .whatsapp-btn {
+    background: #25d366;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+  }
+  .error {
+    color: red;
+    font-size: 14px;
+    margin-top: 4px;
+  }
+</style>
 </head>
 <body>
-  <h1>Formulario de Solicitud de Viaje</h1>
-  <form id="travel-form">
-    <label for="rut">RUT (sin puntos ni guion):</label>
-    <input type="text" id="rut" required /><br><br>
 
-    <label for="clave">Clave Personal:</label>
-    <input type="text" id="clave" required /><br><br>
+<h1>Confía - Servicio de Viajes</h1>
 
-    <label for="nombre">Nombre del pasajero:</label>
-    <input type="text" id="nombre" readonly /><br><br>
+<div class="conductores">
+  <h2>Conductores disponibles</h2>
+  <div class="conductor-item">
+    <strong>Cristián González</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56920142327" target="_blank">WhatsApp</a>
+  </div>
+  <div class="conductor-item">
+    <strong>Juan Pérez</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56912345678" target="_blank">WhatsApp</a>
+  </div>
+  <div class="conductor-item">
+    <strong>María López</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56987654321" target="_blank">WhatsApp</a>
+  </div>
+</div>
 
-    <label for="fecha">Fecha del viaje:</label>
-    <input type="date" id="fecha" required /><br><br>
+<h2>Solicita tu viaje</h2>
+<form id="solicitudForm" autocomplete="off">
 
-    <label for="hora">Hora (24 horas):</label>
-    <input type="time" id="hora" required /><br><br>
+  <label for="rut">RUT (sin puntos ni guion):</label>
+  <input type="text" id="rut" name="rut" placeholder="Ejemplo: 12345678k" required />
+  <div id="errorRut" class="error"></div>
 
-    <label for="origen">Origen del viaje:</label>
-    <input type="text" id="origen" required /><br><br>
+  <label for="clave">Clave Personal:</label>
+  <input type="password" id="clave" name="clave" placeholder="Tu clave" required />
+  <div id="errorClave" class="error"></div>
 
-    <label for="destino">Destino del viaje:</label>
-    <input type="text" id="destino" required /><br><br>
+  <label for="nombre">Nombre completo:</label>
+  <input type="text" id="nombre" name="nombre" placeholder="Nombre se llena automáticamente" readonly required />
 
-    <label for="conductor">Selecciona conductor:</label>
-    <select id="conductor" required>
-      <option value="">-- Elige un conductor --</option>
-      <option value="https://wa.me/56912345678">Juan Pérez</option>
-      <option value="https://wa.me/56987654321">María González</option>
-    </select><br><br>
+  <label for="fecha">Fecha de recogida:</label>
+  <input type="date" id="fecha" name="fecha" required />
 
-    <button type="submit">Solicitar Viaje</button>
-  </form>
+  <label for="hora">Hora de recogida (24h):</label>
+  <input type="time" id="hora" name="hora" required />
 
-  <script>
-    const pasajeros = [
-      { rut: "111111111", clave: "ClaveA", nombre: "Ana Torres" },
-      { rut: "222222222", clave: "ClaveB", nombre: "Carlos Muñoz" },
-      { rut: "333333333", clave: "ClaveC", nombre: "Josefa Rojas" }
-    ];
+  <label for="origen">Lugar de partida:</label>
+  <input type="text" id="origen" name="origen" placeholder="Dirección o referencia" required />
 
-    const rutInput = document.getElementById('rut');
-    const claveInput = document.getElementById('clave');
-    const nombreInput = document.getElementById('nombre');
-    const form = document.getElementById('travel-form');
+  <label for="destino">Destino:</label>
+  <input type="text" id="destino" name="destino" placeholder="Dirección o referencia" required />
 
-    let pasajeroActual = null;
+  <label for="conductor">Selecciona conductor:</label>
+  <select id="conductor" name="conductor" required>
+    <option value="" disabled selected>-- Elige un conductor --</option>
+    <option value="56920142327">Cristián González</option>
+    <option value="56912345678">Juan Pérez</option>
+    <option value="56987654321">María López</option>
+  </select>
 
-    function validarRut(rut) {
-      if (!/^\d{7,8}[0-9kK]?$/.test(rut)) return false;
+  <button type="submit">Enviar solicitud por WhatsApp</button>
+</form>
 
-      let cuerpo = rut.slice(0, -1);
-      let dv = rut.slice(-1).toLowerCase();
+<script>
+  // Lista de pasajeros confiables con RUT (sin puntos ni guion), clave y nombre
+  const pasajeros = [
+    { rut: '12345678k', clave: 'ClaveUno', nombre: 'Pedro Martínez' },
+    { rut: '87654321k', clave: 'ClaveDos', nombre: 'Ana Gómez' },
+    { rut: '11223344k', clave: 'ClaveTres', nombre: 'Luis Fernández' }
+  ];
 
-      let suma = 0;
-      let multiplo = 2;
+  // Validación simple de RUT chileno (sin puntos ni guion) con dígito verificador
+  function validarRut(rut) {
+    rut = rut.toLowerCase().replace(/\./g, '').replace(/-/g, '');
+    if (!/^[0-9]+[0-9k]$/.test(rut)) return false;
 
-      for (let i = cuerpo.length - 1; i >= 0; i--) {
-        suma += parseInt(cuerpo[i]) * multiplo;
-        multiplo = multiplo < 7 ? multiplo + 1 : 2;
-      }
+    let cuerpo = rut.slice(0, -1);
+    let dv = rut.slice(-1);
 
-      let dvEsperado = 11 - (suma % 11);
-      dvEsperado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "k" : dvEsperado.toString();
+    let suma = 0;
+    let multiplo = 2;
 
-      return dv === dvEsperado;
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += multiplo * parseInt(cuerpo.charAt(i), 10);
+      multiplo = multiplo < 7 ? multiplo + 1 : 2;
+    }
+    let dvEsperado = 11 - (suma % 11);
+    dvEsperado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'k' : dvEsperado.toString();
+
+    return dv === dvEsperado;
+  }
+
+  const rutInput = document.getElementById('rut');
+  const claveInput = document.getElementById('clave');
+  const nombreInput = document.getElementById('nombre');
+  const errorRut = document.getElementById('errorRut');
+  const errorClave = document.getElementById('errorClave');
+
+  function limpiarErrores() {
+    errorRut.textContent = '';
+    errorClave.textContent = '';
+  }
+
+  // Función para buscar pasajero por rut y clave
+  function buscarPasajero(rut, clave) {
+    return pasajeros.find(p => p.rut.toLowerCase() === rut.toLowerCase() && p.clave === clave);
+  }
+
+  // Validar y autollenar nombre cuando cambien RUT o Clave
+  function validarYAutollenar() {
+    limpiarErrores();
+    const rut = rutInput.value.trim();
+    const clave = claveInput.value.trim();
+
+    if (!validarRut(rut)) {
+      errorRut.textContent = 'RUT inválido.';
+      nombreInput.value = '';
+      return false;
     }
 
-    rutInput.addEventListener('blur', () => {
-      const rut = rutInput.value.trim();
-      if (!validarRut(rut)) {
-        alert("RUT inválido. Debe ingresarlo sin puntos ni guion, pero con dígito verificador.");
-        rutInput.value = '';
-        rutInput.focus();
-        pasajeroActual = null;
-        return;
-      }
-    });
+    if (clave.length === 0) {
+      errorClave.textContent = '';
+      nombreInput.value = '';
+      return false;
+    }
 
-    claveInput.addEventListener('blur', () => {
-      const rut = rutInput.value.trim();
-      const clave = claveInput.value.trim();
+    const pasajero = buscarPasajero(rut, clave);
+    if (!pasajero) {
+      errorClave.textContent = 'RUT o Clave Personal incorrectos.';
+      nombreInput.value = '';
+      return false;
+    }
 
-      const encontrado = pasajeros.find(p => p.rut === rut && p.clave === clave);
-      if (encontrado) {
-        nombreInput.value = encontrado.nombre;
-        pasajeroActual = encontrado;
-      } else {
-        alert("RUT o Clave Personal incorrectos.");
-        claveInput.value = '';
-        nombreInput.value = '';
-        pasajeroActual = null;
-      }
-    });
+    nombreInput.value = pasajero.nombre;
+    errorClave.textContent = '';
+    return true;
+  }
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!pasajeroActual) {
-        alert("Debe ingresar correctamente el RUT y la Clave Personal antes de continuar.");
-        return;
-      }
+  rutInput.addEventListener('input', validarYAutollenar);
+  claveInput.addEventListener('input', validarYAutollenar);
 
-      const fecha = document.getElementById('fecha').value;
-      const hora = document.getElementById('hora').value;
-      const origen = document.getElementById('origen').value;
-      const destino = document.getElementById('destino').value;
-      const conductorLink = document.getElementById('conductor').value;
+  // Función para convertir hora 24h a formato 12h con AM/PM
+  function formato12h(hora24) {
+    const [hora, minutos] = hora24.split(':');
+    let hora12 = parseInt(hora, 10);
+    const ampm = hora12 >= 12 ? 'PM' : 'AM';
+    hora12 = hora12 % 12;
+    if (hora12 === 0) hora12 = 12;
+    return `${hora12}:${minutos} ${ampm}`;
+  }
 
-      if (!conductorLink) {
-        alert("Debe seleccionar un conductor.");
-        return;
-      }
+  document.getElementById('solicitudForm').addEventListener('submit', function(e) {
+    e.preventDefault();
 
-      const mensaje = `Nueva solicitud de viaje:\n\n` +
-                      `Nombre del pasajero: ${pasajeroActual.nombre}\n` +
-                      `RUT: ${pasajeroActual.rut}\n` +
-                      `Fecha: ${fecha}\n` +
-                      `Hora: ${hora}\n` +
-                      `Origen: ${origen}\n` +
-                      `Destino: ${destino}`;
+    limpiarErrores();
 
-      const url = `${conductorLink}?text=${encodeURIComponent(mensaje)}`;
-      window.open(url, '_blank');
-    });
-  </script>
+    const rut = rutInput.value.trim();
+    const clave = claveInput.value.trim();
+    const nombre = nombreInput.value.trim();
+    const fecha = document.getElementById('fecha').value;
+    const hora = document.getElementById('hora').value;
+    const origen = document.getElementById('origen').value.trim();
+    const destino = document.getElementById('destino').value.trim();
+    const conductorTelefono = document.getElementById('conductor').value;
+    const conductorNombre = document.getElementById('conductor').selectedOptions[0].textContent;
+
+    if (!validarRut(rut)) {
+      errorRut.textContent = 'RUT inválido.';
+      return;
+    }
+
+    if (clave.length === 0) {
+      errorClave.textContent = 'Ingrese Clave Personal.';
+      return;
+    }
+
+    if (!buscarPasajero(rut, clave)) {
+      errorClave.textContent = 'RUT o Clave Personal incorrectos.';
+      return;
+    }
+
+    if (nombre.length === 0) {
+      alert('Nombre no está completo.');
+      return;
+    }
+
+    if (!fecha) {
+      alert('Seleccione la fecha de recogida.');
+      return;
+    }
+    if (!hora) {
+      alert('Seleccione la hora de recogida.');
+      return;
+    }
+    if (origen.length === 0) {
+      alert('Ingrese el lugar de partida.');
+      return;
+    }
+    if (destino.length === 0) {
+      alert('Ingrese el destino.');
+      return;
+    }
+    if (!conductorTelefono) {
+      alert('Seleccione un conductor.');
+      return;
+    }
+
+    // Convertir hora 24h a 12h AM/PM para el mensaje
+    const horaFormato12 = formato12h(hora);
+
+    // Armar mensaje para WhatsApp
+    const mensaje = 
+`Solicitud de viaje:
+Nombre del pasajero: ${nombre}
+RUT: ${rut}
+Fecha recogida: ${fecha}
+Hora recogida: ${horaFormato12}
+Desde: ${origen}
+Hasta: ${destino}
+Conductor: ${conductorNombre}`;
+
+    // Crear enlace WhatsApp
+    const urlWhatsapp = `https://wa.me/${conductorTelefono}?text=${encodeURIComponent(mensaje)}`;
+
+    // Abrir WhatsApp en nueva ventana
+    window.open(urlWhatsapp, '_blank');
+  });
+</script>
+
 </body>
 </html>
