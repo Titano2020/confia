@@ -125,6 +125,7 @@
   </form>
 
   <script>
+    // Lista pasajeros y sus claves
     const pasajeros = [
       { rut: "123456785", clave: "Clave123", nombre: "Juan Pérez" },
       { rut: "987654321", clave: "Segura1", nombre: "Ana Gómez" },
@@ -132,22 +133,29 @@
       { rut: "556677889", clave: "Clave999", nombre: "Carla Díaz" }
     ];
 
+    // Número WhatsApp de conductores (ejemplos, reemplazar por reales con formato internacional sin +)
+    const numerosConductores = {
+      "Cristián González": "56912345678",
+      "María López": "56987654321",
+      "Javier Fernández": "56911223344",
+      "Carolina Méndez": "56944332211",
+      "Andrés Rojas": "56999887766"
+    };
+
     const rutInput = document.getElementById("rut");
     const claveInput = document.getElementById("clave");
     const nombreInput = document.getElementById("nombre");
     const form = document.getElementById("viajeForm");
 
-    // Al cambiar el RUT, buscar pasajero y llenar nombre si clave es correcta
+    // Limpiar nombre si cambian rut o clave
     rutInput.addEventListener("input", () => {
-      nombreInput.value = ""; // Limpiar nombre para nueva búsqueda
+      nombreInput.value = "";
     });
-
     claveInput.addEventListener("input", () => {
-      // Vaciar nombre mientras escriben clave
       nombreInput.value = "";
     });
 
-    // Al salir de clave o rut, intentar autocompletar el nombre
+    // Completar nombre si coinciden RUT y clave
     function validarPasajero() {
       const rut = rutInput.value.trim();
       const clave = claveInput.value.trim();
@@ -168,35 +176,48 @@
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
+
       if (!validarPasajero()) {
         alert("RUT o Clave Personal incorrectos. No se enviará la solicitud.");
         return;
       }
 
-      // Aquí puedes manejar el envío del formulario, por ejemplo:
-      const datos = {
-        rut: rutInput.value.trim(),
-        nombre: nombreInput.value.trim(),
-        clave: claveInput.value.trim(),
-        origen: document.getElementById("origen").value.trim(),
-        destino: document.getElementById("destino").value.trim(),
-        fecha: document.getElementById("fecha").value,
-        hora: document.getElementById("hora").value,
-        conductor: document.getElementById("conductor").value
-      };
+      const rut = rutInput.value.trim();
+      const nombre = nombreInput.value.trim();
+      const origen = document.getElementById("origen").value.trim();
+      const destino = document.getElementById("destino").value.trim();
+      const fecha = document.getElementById("fecha").value;
+      const hora = document.getElementById("hora").value;
+      const conductor = document.getElementById("conductor").value;
 
-      // Enviar datos por fetch, XMLHttpRequest o abrir WhatsApp, etc.
-      // Por ahora solo muestro confirmación:
-      alert(
-        `Solicitud enviada:\n` +
-        `Nombre del pasajero: ${datos.nombre}\n` +
-        `RUT: ${datos.rut}\n` +
-        `Origen: ${datos.origen}\n` +
-        `Destino: ${datos.destino}\n` +
-        `Fecha: ${datos.fecha}\n` +
-        `Hora: ${datos.hora}\n` +
-        `Conductor: ${datos.conductor}`
-      );
+      if (!conductor) {
+        alert("Por favor, seleccione un conductor.");
+        return;
+      }
+
+      // Construir mensaje para WhatsApp
+      const mensaje =
+        `Solicitud de viaje segura:\n` +
+        `Nombre del pasajero: ${nombre}\n` +
+        `RUT: ${rut}\n` +
+        `Origen: ${origen}\n` +
+        `Destino: ${destino}\n` +
+        `Fecha: ${fecha}\n` +
+        `Hora: ${hora}\n` +
+        `Conductor asignado: ${conductor}`;
+
+      // Obtener número de conductor
+      const numeroConductor = numerosConductores[conductor];
+      if (!numeroConductor) {
+        alert("Número de conductor no encontrado.");
+        return;
+      }
+
+      // Abrir WhatsApp Web / app móvil
+      const urlWhatsApp = `https://wa.me/${numeroConductor}?text=${encodeURIComponent(mensaje)}`;
+      window.open(urlWhatsApp, "_blank");
+
+      alert("Se ha abierto WhatsApp con el mensaje listo para enviar al conductor.");
 
       form.reset();
       nombreInput.value = "";
