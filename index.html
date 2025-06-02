@@ -61,8 +61,9 @@
     font-weight: bold;
     font-size: 14px;
   }
-  .error {
+  .error-message {
     color: red;
+    font-weight: bold;
     margin-top: 5px;
   }
 </style>
@@ -90,25 +91,24 @@
 <h2>Solicita tu viaje</h2>
 <form id="solicitudForm" autocomplete="off">
   <label for="rut">RUT (sin puntos ni guion):</label>
-  <input type="text" id="rut" name="rut" placeholder="12345678k" maxlength="9" required />
+  <input type="text" id="rut" name="rut" placeholder="Ej: 123456785" maxlength="9" required />
+  <div id="errorRut" class="error-message"></div>
 
   <label for="clave">Clave Personal:</label>
   <input type="password" id="clave" name="clave" placeholder="Tu clave personal" required />
+  <div id="errorClave" class="error-message"></div>
 
   <label for="nombre">Nombre completo:</label>
-  <input type="text" id="nombre" name="nombre" placeholder="Nombre se llenará automáticamente" readonly required />
+  <input type="text" id="nombre" name="nombre" placeholder="Nombre se llena automáticamente" readonly required />
 
-  <label for="telefono">Teléfono (con código país):</label>
-  <input type="tel" id="telefono" name="telefono" placeholder="+56912345678" required />
+  <label for="fecha">Fecha de recogida:</label>
+  <input type="date" id="fecha" name="fecha" required />
+
+  <label for="hora">Hora de recogida (24h):</label>
+  <input type="time" id="hora" name="hora" required />
 
   <label for="origen">Lugar de partida:</label>
   <input type="text" id="origen" name="origen" placeholder="Dirección o referencia" required />
-
-  <label for="fechaRecogida">Fecha de recogida:</label>
-  <input type="date" id="fechaRecogida" name="fechaRecogida" required />
-
-  <label for="horaRecogida">Hora de recogida (formato 24 horas):</label>
-  <input type="time" id="horaRecogida" name="horaRecogida" required />
 
   <label for="destino">Destino:</label>
   <input type="text" id="destino" name="destino" placeholder="Dirección o referencia" required />
@@ -121,111 +121,137 @@
     <option value="56987654321">María López</option>
   </select>
 
-  <div id="errorMensaje" class="error"></div>
-
   <button type="submit">Enviar solicitud por WhatsApp</button>
 </form>
 
 <script>
+  // Datos pasajeros con RUT sin puntos ni guion
   const pasajeros = [
     { rut: '123456785', clave: 'Cristian1', nombre: 'Cristián González' },
     { rut: '987654321', clave: 'JuanP2', nombre: 'Juan Pérez' },
     { rut: '111111114', clave: 'MariaL3', nombre: 'María López' }
   ];
 
-  function validarRut(rut) {
-    if (!/^\d{7,8}[0-9kK]$/.test(rut)) return false;
-    let cuerpo = rut.slice(0, -1);
-    let dv = rut.slice(-1).toLowerCase();
-
+  function digitoVerificador(rut) {
     let suma = 0;
     let multiplo = 2;
-    for (let i = cuerpo.length - 1; i >= 0; i--) {
-      suma += multiplo * parseInt(cuerpo.charAt(i));
-      multiplo = multiplo < 7 ? multiplo + 1 : 2;
+    for (let i = rut.length - 1; i >= 0; i--) {
+      suma += parseInt(rut.charAt(i)) * multiplo;
+      multiplo = multiplo === 7 ? 2 : multiplo + 1;
     }
-    let dvEsperado = 11 - (suma % 11);
-    if (dvEsperado === 11) dvEsperado = '0';
-    else if (dvEsperado === 10) dvEsperado = 'k';
-    else dvEsperado = dvEsperado.toString();
-
-    return dv === dvEsperado;
+    const dv = 11 - (suma % 11);
+    if (dv === 11) return '0';
+    if (dv === 10) return 'K';
+    return dv.toString();
   }
 
-  const rutInput = document.getElementById('rut');
-  const claveInput = document.getElementById('clave');
-  const nombreInput = document.getElementById('nombre');
-  const errorDiv = document.getElementById('errorMensaje');
-
-  function limpiarError() {
-    errorDiv.textContent = '';
+  function validarRut(rutCompleto) {
+    if (rutCompleto.length < 8) return false;
+    const rut = rutCompleto.slice(0, -1);
+    const dv = rutCompleto.slice(-1).toUpperCase();
+    return digitoVerificador(rut) === dv;
   }
 
-  function validarRutClave() {
-    limpiarError();
-    const rut = rutInput.value.trim().toLowerCase();
-    const clave = claveInput.value.trim();
-    if (!validarRut(rut)) {
-      nombreInput.value = '';
-      errorDiv.textContent = 'RUT inválido.';
-      return false;
-    }
-    const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut && p.clave === clave);
-    if (pasajero) {
-      nombreInput.value = pasajero.nombre;
-      limpiarError();
-      return true;
-    } else {
-      nombreInput.value = '';
-      if (clave.length > 0) {
-        errorDiv.textContent = 'RUT o Clave Personal incorrectos.';
+  // Validar y autocompletar nombre
+  document.getElementById('rut').addEventListener('input', function() {
+    const rutInput = this.value.trim();
+    document.getElementById('errorRut').textContent = '';
+    document.getElementById('errorClave').textContent = '';
+    document.getElementById('nombre').value = '';
+
+    if (rutInput.length === 8 || rutInput.length === 9) {
+      // Para validar rut, se espera último caracter como dígito verificador
+      // Aquí validamos formato: últimos 1 dígito es dv, rut sin dv es resto
+      if (!/^\d{7,8}[0-9Kk]?$/.test(rutInput)) {
+        document.getElementById('errorRut').textContent = 'Formato de RUT incorrecto.';
+        return;
       }
-      return false;
+      if (!validarRut(rutInput)) {
+        document.getElementById('errorRut').textContent = 'RUT inválido.';
+        return;
+      }
+    } else {
+      document.getElementById('errorRut').textContent = 'El RUT debe tener 8 o 9 caracteres incluyendo dígito verificador.';
+      return;
     }
-  }
-
-  rutInput.addEventListener('input', () => {
-    nombreInput.value = '';
-    limpiarError();
   });
 
-  claveInput.addEventListener('input', validarRutClave);
+  document.getElementById('clave').addEventListener('input', function() {
+    const rutInput = document.getElementById('rut').value.trim().toUpperCase();
+    const claveInput = this.value.trim();
+    document.getElementById('errorClave').textContent = '';
+    document.getElementById('nombre').value = '';
 
+    if (!rutInput || !claveInput) return;
+
+    const pasajero = pasajeros.find(p => (p.rut.toUpperCase() === rutInput) && (p.clave === claveInput));
+    if (pasajero) {
+      document.getElementById('nombre').value = pasajero.nombre;
+      document.getElementById('errorClave').textContent = '';
+    } else {
+      document.getElementById('errorClave').textContent = 'RUT o Clave Personal incorrectos.';
+    }
+  });
+
+  // Envío del formulario por WhatsApp
   document.getElementById('solicitudForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
-    if (!validarRutClave()) {
-      alert('Por favor, ingresa un RUT y Clave Personal válidos.');
-      return;
-    }
-
-    const nombre = nombreInput.value.trim();
-    const telefono = document.getElementById('telefono').value.trim();
+    const rut = document.getElementById('rut').value.trim().toUpperCase();
+    const clave = document.getElementById('clave').value.trim();
+    const nombre = document.getElementById('nombre').value.trim();
+    const fecha = document.getElementById('fecha').value;
+    const hora = document.getElementById('hora').value;
     const origen = document.getElementById('origen').value.trim();
-    const fechaRecogida = document.getElementById('fechaRecogida').value.trim();
-    const horaRecogida = document.getElementById('horaRecogida').value.trim();
     const destino = document.getElementById('destino').value.trim();
-    const conductorTelefono = document.getElementById('conductor').value;
+    const conductor = document.getElementById('conductor').value;
 
-    if (!nombre || !telefono || !origen || !fechaRecogida || !horaRecogida || !destino || !conductorTelefono) {
-      alert('Por favor completa todos los campos.');
+    // Validaciones
+    if (!validarRut(rut)) {
+      alert('El RUT ingresado no es válido.');
+      return;
+    }
+    const pasajero = pasajeros.find(p => (p.rut.toUpperCase() === rut) && (p.clave === clave));
+    if (!pasajero) {
+      alert('RUT o Clave Personal incorrectos.');
+      return;
+    }
+    if (!nombre) {
+      alert('Nombre no se ha llenado automáticamente. Verifique RUT y Clave Personal.');
+      return;
+    }
+    if (!fecha) {
+      alert('Debe seleccionar una fecha de recogida.');
+      return;
+    }
+    if (!hora) {
+      alert('Debe seleccionar una hora de recogida.');
+      return;
+    }
+    if (!origen || !destino) {
+      alert('Debe ingresar origen y destino.');
+      return;
+    }
+    if (!conductor) {
+      alert('Debe seleccionar un conductor.');
       return;
     }
 
-    // Crear mensaje WhatsApp
+    // Crear mensaje para WhatsApp
     const mensaje = 
-`Solicitud de viaje
+`Solicitud de viaje:
 Nombre: ${nombre}
-Teléfono: ${telefono}
-Origen: ${origen}
-Fecha de recogida: ${fechaRecogida}
-Hora de recogida: ${horaRecogida}
-Destino: ${destino}`;
+RUT: ${rut}
+Fecha recogida: ${fecha}
+Hora recogida: ${hora}
+Desde: ${origen}
+Hasta: ${destino}
+Conductor: ${document.querySelector('#conductor option:checked').textContent}`;
 
-    // Url whatsapp con mensaje y conductor
-    const urlWhatsapp = `https://wa.me/${conductorTelefono}?text=${encodeURIComponent(mensaje)}`;
+    const numeroWhatsapp = conductor; // número sin + ni 00 ni guiones, ejemplo: 56920142327
+    const url = `https://wa.me/${numeroWhatsapp}?text=${encodeURIComponent(mensaje)}`;
 
-    window.open(urlWhatsapp, '_blank');
+    window.open(url, '_blank');
   });
 </script>
 
