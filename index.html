@@ -72,6 +72,13 @@
       padding: 6px 0;
       border-bottom: 1px solid #ddd;
     }
+    .form-title {
+      text-align: center;
+      font-size: 18px;
+      color: #222;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -82,11 +89,14 @@
     <h2>Conductores disponibles</h2>
     <ul>
       <li>Cristián González</li>
-      <li>Martha Chapa</li>
-      <li>Pamela Lemus</li>
-      
+      <li>María López</li>
+      <li>Javier Fernández</li>
+      <li>Carolina Méndez</li>
+      <li>Andrés Rojas</li>
     </ul>
   </div>
+
+  <div class="form-title">Ingrese sus datos de pasajero</div>
 
   <form id="viajeForm">
     <label for="rut">RUT (sin puntos ni guion):</label>
@@ -124,7 +134,6 @@
   </form>
 
   <script>
-    // Lista pasajeros y sus claves
     const pasajeros = [
       { rut: "123456785", clave: "Clave123", nombre: "Juan Pérez" },
       { rut: "987654321", clave: "Segura1", nombre: "Ana Gómez" },
@@ -132,13 +141,11 @@
       { rut: "556677889", clave: "Clave999", nombre: "Carla Díaz" }
     ];
 
-    // Número WhatsApp de conductores (ejemplos, reemplazar por reales con formato internacional sin +)
     const numerosConductores = {
-      "Cristián González": "56920142327",
-      "María López": "56987654321",
-      "Javier Fernández": "56911223344",
-      "Carolina Méndez": "56944332211",
-      "Andrés Rojas": "56999887766"
+      "Cristián González": "56912345678",
+      "Martha Chapa": "56987654321",
+      "Pamela Lemus": "56911223344",
+      
     };
 
     const rutInput = document.getElementById("rut");
@@ -146,7 +153,6 @@
     const nombreInput = document.getElementById("nombre");
     const form = document.getElementById("viajeForm");
 
-    // Limpiar nombre si cambian rut o clave
     rutInput.addEventListener("input", () => {
       nombreInput.value = "";
     });
@@ -154,7 +160,6 @@
       nombreInput.value = "";
     });
 
-    // Completar nombre si coinciden RUT y clave
     function validarPasajero() {
       const rut = rutInput.value.trim();
       const clave = claveInput.value.trim();
@@ -194,7 +199,6 @@
         return;
       }
 
-      // Construir mensaje para WhatsApp
       const mensaje =
         `Solicitud de viaje segura:\n` +
         `Nombre del pasajero: ${nombre}\n` +
@@ -205,14 +209,12 @@
         `Hora: ${hora}\n` +
         `Conductor solicitado: ${conductor}`;
 
-      // Obtener número de conductor
       const numeroConductor = numerosConductores[conductor];
       if (!numeroConductor) {
         alert("Número de conductor no encontrado.");
         return;
       }
 
-      // Abrir WhatsApp Web / app móvil
       const urlWhatsApp = `https://wa.me/${numeroConductor}?text=${encodeURIComponent(mensaje)}`;
       window.open(urlWhatsApp, "_blank");
 
