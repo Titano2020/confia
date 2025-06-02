@@ -11,6 +11,9 @@
       max-width: 600px;
       margin: auto;
     }
+    h2, h3 {
+      text-align: center;
+    }
     input, select, button {
       display: block;
       margin: 10px 0;
@@ -22,11 +25,23 @@
       color: red;
       font-weight: bold;
     }
+    .conductores {
+      background-color: #f2f2f2;
+      padding: 10px;
+      margin-bottom: 20px;
+      border-radius: 6px;
+    }
   </style>
 </head>
 <body>
 
-<h2>Formulario de Solicitud de Viaje</h2>
+<h2>Conductores Disponibles</h2>
+<div class="conductores">
+  <p><strong>🚘 Carlos Soto</strong> - Zona Norte</p>
+  <p><strong>🚘 Lucía Herrera</strong> - Zona Centro</p>
+</div>
+
+<h3>Formulario de Solicitud de Viaje</h3>
 
 <form id="formularioViaje">
   <label for="rut">RUT (sin puntos ni guion):</label>
@@ -116,8 +131,6 @@
     `.trim();
 
     alert("Mensaje para el conductor:\n\n" + mensaje);
-
-    // Aquí puedes luego agregar integración con backend si se desea
   });
 </script>
 
