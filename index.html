@@ -29,6 +29,9 @@
       border: 1px solid #ccc;
       box-sizing: border-box;
     }
+    input[readonly] {
+      background-color: #e9e9e9;
+    }
     button {
       margin-top: 20px;
       width: 100%;
@@ -92,7 +95,7 @@
   <input type="text" id="codigo" name="codigo" placeholder="Codigo123" required />
 
   <label for="nombre">Nombre completo:</label>
-  <input type="text" id="nombre" name="nombre" readonly required />
+  <input type="text" id="nombre" name="nombre" placeholder="Nombre se llenará automáticamente" readonly required />
 
   <label for="telefono">Teléfono (con código país):</label>
   <input type="tel" id="telefono" name="telefono" placeholder="+56912345678" required />
@@ -116,48 +119,53 @@
 
 <script>
   const pasajerosAutorizados = {
-    "123456789": { codigo: "Codigo123", nombre: "Pedro Gómez" },
-    "987654321": { codigo: "Pass456", nombre: "Ana Torres" },
-    "112233445": { codigo: "Clave789", nombre: "Luis Fernández" }
+    "123456789": { nombre: "Carlos Ramírez", codigo: "Confia123" },
+    "987654321": { nombre: "Marcela Soto", codigo: "Confia456" },
+    "112233445": { nombre: "Pedro Álvarez", codigo: "Confia789" }
   };
 
   const rutInput = document.getElementById('rut');
   const codigoInput = document.getElementById('codigo');
   const nombreInput = document.getElementById('nombre');
 
+  // Autocompleta el nombre si el RUT y código son válidos
   function validarPasajero() {
     const rut = rutInput.value.trim();
     const codigo = codigoInput.value.trim();
 
     if (pasajerosAutorizados[rut] && pasajerosAutorizados[rut].codigo === codigo) {
       nombreInput.value = pasajerosAutorizados[rut].nombre;
-      nombreInput.readOnly = true;
     } else {
       nombreInput.value = '';
-      alert("RUT o código incorrecto. Acceso denegado.");
     }
   }
 
-  codigoInput.addEventListener('blur', validarPasajero);
+  rutInput.addEventListener('input', validarPasajero);
+  codigoInput.addEventListener('input', validarPasajero);
 
   document.getElementById('solicitudForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const rut = rutInput.value.trim();
     const codigo = codigoInput.value.trim();
-
-    if (!pasajerosAutorizados[rut] || pasajerosAutorizados[rut].codigo !== codigo) {
-      alert("RUT o código inválido. No puedes enviar la solicitud.");
-      return;
-    }
-
-    const nombre = pasajerosAutorizados[rut].nombre;
+    const nombre = nombreInput.value.trim();
     const telefono = document.getElementById('telefono').value.trim();
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
     const conductorTelefono = document.getElementById('conductor').value;
 
-    const mensaje = 
+    if (!rut || !codigo || !nombre || !telefono || !origen || !destino || !conductorTelefono) {
+      alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    // Validación de seguridad
+    if (!pasajerosAutorizados[rut] || pasajerosAutorizados[rut].codigo !== codigo) {
+      alert('RUT o código inválido. Solicitud rechazada.');
+      return;
+    }
+
+    const mensaje =
       `Hola, soy ${nombre}.%0A` +
       `Quiero solicitar un viaje desde: ${origen}%0A` +
       `Hasta: ${destino}%0A` +
