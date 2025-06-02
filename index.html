@@ -97,12 +97,12 @@
 </div>
 
 <h2>Solicita tu viaje</h2>
-<form id="solicitudForm" autocomplete="off">
+<form id="solicitudForm" autocomplete="off" novalidate>
   <label for="rut">RUT (sin puntos ni guion):</label>
   <input type="text" id="rut" name="rut" placeholder="123456785" maxlength="9" required />
 
-  <label for="codigo">Código de seguridad:</label>
-  <input type="text" id="codigo" name="codigo" placeholder="Clave de seguridad" required />
+  <label for="codigo">Clave Personal:</label>
+  <input type="text" id="codigo" name="codigo" placeholder="Clave Personal" required />
 
   <label for="nombre">Nombre completo:</label>
   <input type="text" id="nombre" name="nombre" placeholder="Se llenará automáticamente" readonly required />
@@ -155,6 +155,12 @@
     const rut = document.getElementById('rut').value.trim();
     const codigo = document.getElementById('codigo').value.trim();
     const mensajeDiv = document.getElementById('mensajeValidacion');
+    if (!validarRUT(rut)) {
+      mensajeDiv.textContent = "RUT inválido.";
+      mensajeDiv.className = "mensaje-validacion mensaje-error";
+      document.getElementById('nombre').value = "";
+      return false;
+    }
     const pasajero = pasajerosAutorizados[rut];
     if (pasajero && pasajero.codigo === codigo) {
       document.getElementById('nombre').value = pasajero.nombre;
@@ -166,7 +172,7 @@
       if (rut === "" && codigo === "") {
         mensajeDiv.textContent = "";
       } else {
-        mensajeDiv.textContent = "RUT o código incorrecto ❌";
+        mensajeDiv.textContent = "RUT o Clave Personal incorrectos ❌";
         mensajeDiv.className = "mensaje-validacion mensaje-error";
       }
       return false;
@@ -188,12 +194,22 @@
     const conductorTelefono = document.getElementById('conductor').value;
 
     if (!validarRUT(rut)) {
-      alert("RUT inválido.");
+      alert("RUT inválido. Por favor verifica.");
       return;
     }
 
     if (!verificarPasajero()) {
-      alert("Datos no válidos. Revisa tu RUT y código.");
+      alert("Datos no válidos. Revisa tu RUT y Clave Personal.");
+      return;
+    }
+
+    if (!nombre) {
+      alert("No se pudo validar el pasajero. Verifica RUT y Clave Personal.");
+      return;
+    }
+
+    if (!telefono || !origen || !destino || !conductorTelefono) {
+      alert("Por favor completa todos los campos.");
       return;
     }
 
