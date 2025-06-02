@@ -29,9 +29,6 @@
     border: 1px solid #ccc;
     box-sizing: border-box;
   }
-  input[readonly] {
-    background: #e0e0e0;
-  }
   button {
     margin-top: 20px;
     width: 100%;
@@ -64,15 +61,11 @@
     font-weight: bold;
     font-size: 14px;
   }
-  .mensaje-validacion {
-    margin-top: 4px;
-    font-size: 14px;
-  }
-  .mensaje-exito {
-    color: green;
-  }
-  .mensaje-error {
+  #error {
     color: red;
+    margin-top: 8px;
+    font-weight: bold;
+    text-align: center;
   }
 </style>
 </head>
@@ -97,17 +90,17 @@
 </div>
 
 <h2>Solicita tu viaje</h2>
-<form id="solicitudForm" autocomplete="off" novalidate>
+<form id="solicitudForm">
   <label for="rut">RUT (sin puntos ni guion):</label>
-  <input type="text" id="rut" name="rut" placeholder="123456785" maxlength="9" required />
+  <input type="text" id="rut" name="rut" placeholder="123456789" required />
 
-  <label for="codigo">Clave Personal:</label>
-  <input type="text" id="codigo" name="codigo" placeholder="Clave Personal" required />
+  <label for="clavePersonal">Clave Personal:</label>
+  <input type="text" id="clavePersonal" name="clavePersonal" placeholder="Clave personal" required />
 
   <label for="nombre">Nombre completo:</label>
-  <input type="text" id="nombre" name="nombre" placeholder="Se llenará automáticamente" readonly required />
-  
-  <div id="mensajeValidacion" class="mensaje-validacion"></div>
+  <input type="text" id="nombre" name="nombre" placeholder="Nombre se llenará automáticamente" readonly />
+
+  <div id="error"></div>
 
   <label for="telefono">Teléfono (con código país):</label>
   <input type="tel" id="telefono" name="telefono" placeholder="+56912345678" required />
@@ -130,98 +123,65 @@
 </form>
 
 <script>
-  const pasajerosAutorizados = {
-    "123456785": { nombre: "Pedro Ramírez", codigo: "ClavePedro" },
-    "234567896": { nombre: "Carla Soto", codigo: "ConfiaCarla" },
-    "345678907": { nombre: "Luis Torres", codigo: "LuisConfia" }
-  };
+  const pasajeros = [
+    { rut: "123456789", clave: "Azul123", nombre: "Pedro Ramirez" },
+    { rut: "987654321", clave: "Rojo456", nombre: "Maria Soto" },
+    { rut: "111222333", clave: "Verde789", nombre: "Juan Diaz" },
+  ];
 
-  // Valida RUT chileno simplificado (sin puntos ni guion)
-  function validarRUT(rut) {
-    if (!/^\d{7,8}[0-9kK]$/.test(rut)) return false;
-    const cuerpo = rut.slice(0, -1);
-    let dv = rut.slice(-1).toUpperCase();
-    let suma = 0, multiplo = 2;
-    for (let i = cuerpo.length - 1; i >= 0; i--) {
-      suma += parseInt(cuerpo.charAt(i)) * multiplo;
-      multiplo = multiplo === 7 ? 2 : multiplo + 1;
-    }
-    const dvEsperado = 11 - (suma % 11);
-    const dvCalculado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-    return dv === dvCalculado;
-  }
+  const rutInput = document.getElementById("rut");
+  const claveInput = document.getElementById("clavePersonal");
+  const nombreInput = document.getElementById("nombre");
+  const errorDiv = document.getElementById("error");
 
-  function verificarPasajero() {
-    const rut = document.getElementById('rut').value.trim();
-    const codigo = document.getElementById('codigo').value.trim();
-    const mensajeDiv = document.getElementById('mensajeValidacion');
-    if (!validarRUT(rut)) {
-      mensajeDiv.textContent = "RUT inválido.";
-      mensajeDiv.className = "mensaje-validacion mensaje-error";
-      document.getElementById('nombre').value = "";
-      return false;
+  function validarDatos() {
+    const rut = rutInput.value.trim();
+    const clave = claveInput.value.trim();
+
+    if (rut === "" || clave === "") {
+      errorDiv.textContent = "";
+      nombreInput.value = "";
+      return false;  // No validar hasta que haya ambos datos
     }
-    const pasajero = pasajerosAutorizados[rut];
-    if (pasajero && pasajero.codigo === codigo) {
-      document.getElementById('nombre').value = pasajero.nombre;
-      mensajeDiv.textContent = "Pasajero autorizado ✅";
-      mensajeDiv.className = "mensaje-validacion mensaje-exito";
+
+    const pasajero = pasajeros.find(p => p.rut === rut && p.clave === clave);
+
+    if (pasajero) {
+      nombreInput.value = pasajero.nombre;
+      errorDiv.textContent = "";
       return true;
     } else {
-      document.getElementById('nombre').value = "";
-      if (rut === "" && codigo === "") {
-        mensajeDiv.textContent = "";
-      } else {
-        mensajeDiv.textContent = "RUT o Clave Personal incorrectos ❌";
-        mensajeDiv.className = "mensaje-validacion mensaje-error";
-      }
+      nombreInput.value = "";
+      errorDiv.textContent = "RUT o Clave Personal incorrectos.";
       return false;
     }
   }
 
-  document.getElementById('rut').addEventListener('input', verificarPasajero);
-  document.getElementById('codigo').addEventListener('input', verificarPasajero);
+  rutInput.addEventListener("input", validarDatos);
+  claveInput.addEventListener("input", validarDatos);
 
-  document.getElementById('solicitudForm').addEventListener('submit', function(e) {
-    e.preventDefault();
+  document.getElementById("solicitudForm").addEventListener("submit", function(e) {
+    if (!validarDatos()) {
+      e.preventDefault();
+      alert("Por favor verifica que el RUT y la Clave Personal sean correctos.");
+    } else {
+      // Aquí continúa el envío a WhatsApp si todo es correcto
+      const nombre = nombreInput.value.trim();
+      const telefono = document.getElementById('telefono').value.trim();
+      const origen = document.getElementById('origen').value.trim();
+      const destino = document.getElementById('destino').value.trim();
+      const conductorTelefono = document.getElementById('conductor').value;
 
-    const rut = document.getElementById('rut').value.trim();
-    const codigo = document.getElementById('codigo').value.trim();
-    const nombre = document.getElementById('nombre').value.trim();
-    const telefono = document.getElementById('telefono').value.trim();
-    const origen = document.getElementById('origen').value.trim();
-    const destino = document.getElementById('destino').value.trim();
-    const conductorTelefono = document.getElementById('conductor').value;
+      const mensaje = 
+        `Hola, soy ${nombre}.%0A` +
+        `Quiero solicitar un viaje desde: ${origen}%0A` +
+        `Hasta: ${destino}%0A` +
+        `Mi teléfono de contacto es: ${telefono}%0A` +
+        `Por favor confirma tu disponibilidad. ¡Gracias!`;
 
-    if (!validarRUT(rut)) {
-      alert("RUT inválido. Por favor verifica.");
-      return;
+      const urlWhatsApp = `https://wa.me/${conductorTelefono}?text=${mensaje}`;
+      window.open(urlWhatsApp, '_blank');
     }
-
-    if (!verificarPasajero()) {
-      alert("Datos no válidos. Revisa tu RUT y Clave Personal.");
-      return;
-    }
-
-    if (!nombre) {
-      alert("No se pudo validar el pasajero. Verifica RUT y Clave Personal.");
-      return;
-    }
-
-    if (!telefono || !origen || !destino || !conductorTelefono) {
-      alert("Por favor completa todos los campos.");
-      return;
-    }
-
-    const mensaje =
-      `Hola, soy ${nombre}.%0A` +
-      `Quiero solicitar un viaje desde: ${origen}%0A` +
-      `Hasta: ${destino}%0A` +
-      `Mi teléfono de contacto es: ${telefono}%0A` +
-      `Por favor confirma tu disponibilidad. ¡Gracias!`;
-
-    const urlWhatsApp = `https://wa.me/${conductorTelefono}?text=${mensaje}`;
-    window.open(urlWhatsApp, '_blank');
   });
 </script>
 
