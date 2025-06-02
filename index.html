@@ -27,9 +27,14 @@
     }
     .conductores {
       background-color: #f2f2f2;
-      padding: 10px;
-      margin-bottom: 20px;
-      border-radius: 6px;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .conductores p {
+      margin: 5px 0;
+      font-size: 18px;
     }
   </style>
 </head>
@@ -78,6 +83,7 @@
 </form>
 
 <script>
+  // Pasajeros registrados (RUT sin puntos ni guion)
   const pasajeros = {
     "123456789": { nombre: "María López", clave: "Clave123" },
     "987654321": { nombre: "Carlos Pérez", clave: "Clave456" },
