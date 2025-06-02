@@ -112,6 +112,13 @@
 </form>
 
 <script>
+  // Lista de códigos válidos y sus pasajeros asociados
+  const codigosValidos = {
+    "pass123": "Pedro",
+    "maria456": "María",
+    "juan789": "Juan"
+  };
+
   document.getElementById('solicitudForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
@@ -120,22 +127,20 @@
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
     const conductorTelefono = document.getElementById('conductor').value;
-    const codigoIngresado = document.getElementById('codigo').value.trim();
+    const codigo = document.getElementById('codigo').value.trim();
 
-    const codigoCorrecto = "CONFIA2025";  // Cambia este código cuando quieras
-
-    if (!nombre || !telefono || !origen || !destino || !conductorTelefono || !codigoIngresado) {
+    if (!nombre || !telefono || !origen || !destino || !conductorTelefono || !codigo) {
       alert('Por favor completa todos los campos.');
       return;
     }
 
-    if (codigoIngresado !== codigoCorrecto) {
-      alert('Código incorrecto. Si no tienes un código, contacta al conductor.');
+    if (!codigosValidos[codigo]) {
+      alert('Código incorrecto o no autorizado');
       return;
     }
 
     const mensaje = 
-      `Hola, soy ${nombre}.%0A` +
+      `Hola, soy ${nombre} (pasajero autorizado: ${codigosValidos[codigo]}).%0A` +
       `Quiero solicitar un viaje desde: ${origen}%0A` +
       `Hasta: ${destino}%0A` +
       `Mi teléfono de contacto es: ${telefono}%0A` +
@@ -146,6 +151,9 @@
     window.open(urlWhatsApp, '_blank');
   });
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
