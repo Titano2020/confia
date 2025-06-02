@@ -2,186 +2,132 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Solicitud de Viaje Seguro</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 480px;
-      margin: 2em auto;
-      padding: 1em;
-      background: #f7f7f7;
-      border-radius: 8px;
-    }
-    label {
-      display: block;
-      margin-top: 1em;
-      font-weight: bold;
-    }
-    input[type="text"],
-    input[type="password"],
-    input[type="date"],
-    input[type="time"] {
-      width: 100%;
-      padding: 8px;
-      margin-top: 0.25em;
-      box-sizing: border-box;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-size: 1em;
-    }
-    input[readonly] {
-      background-color: #e9e9e9;
-    }
-    button {
-      margin-top: 1.5em;
-      padding: 10px 15px;
-      font-size: 1.1em;
-      border: none;
-      background-color: #0077cc;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      width: 100%;
-    }
-    button:disabled {
-      background-color: #999;
-      cursor: not-allowed;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solicitud de Viaje</title>
 </head>
 <body>
-  <h2>Solicitud de Viaje Seguro</h2>
-  <form id="formulario">
+  <h1>Formulario de Solicitud de Viaje</h1>
+  <form id="travel-form">
     <label for="rut">RUT (sin puntos ni guion):</label>
-    <input type="text" id="rut" name="rut" placeholder="Ej: 761337534" maxlength="9" autocomplete="off" required />
+    <input type="text" id="rut" required /><br><br>
 
     <label for="clave">Clave Personal:</label>
-    <input type="password" id="clave" name="clave" placeholder="Tu clave personal" disabled autocomplete="off" required />
+    <input type="text" id="clave" required /><br><br>
 
     <label for="nombre">Nombre del pasajero:</label>
-    <input type="text" id="nombre" name="nombre" readonly />
+    <input type="text" id="nombre" readonly /><br><br>
 
     <label for="fecha">Fecha del viaje:</label>
-    <input type="date" id="fecha" name="fecha" required />
+    <input type="date" id="fecha" required /><br><br>
 
-    <label for="hora">Hora del viaje (24 horas):</label>
-    <input type="time" id="hora" name="hora" required />
+    <label for="hora">Hora (24 horas):</label>
+    <input type="time" id="hora" required /><br><br>
 
-    <button type="submit" disabled id="btnEnviar">Enviar solicitud</button>
+    <label for="origen">Origen del viaje:</label>
+    <input type="text" id="origen" required /><br><br>
+
+    <label for="destino">Destino del viaje:</label>
+    <input type="text" id="destino" required /><br><br>
+
+    <label for="conductor">Selecciona conductor:</label>
+    <select id="conductor" required>
+      <option value="">-- Elige un conductor --</option>
+      <option value="https://wa.me/56912345678">Juan Pérez</option>
+      <option value="https://wa.me/56987654321">María González</option>
+    </select><br><br>
+
+    <button type="submit">Solicitar Viaje</button>
   </form>
 
   <script>
     const pasajeros = [
-      { rut: '761337534', clave: 'ClaveUno', nombre: 'Pedro Martínez' },
-      { rut: '19471058k', clave: 'ClaveDos', nombre: 'Ana Gómez' },
-      { rut: '145678905', clave: 'ClaveTres', nombre: 'Luis Fernández' }
+      { rut: "111111111", clave: "ClaveA", nombre: "Ana Torres" },
+      { rut: "222222222", clave: "ClaveB", nombre: "Carlos Muñoz" },
+      { rut: "333333333", clave: "ClaveC", nombre: "Josefa Rojas" }
     ];
-
-    function validarRut(rut) {
-      rut = rut.toLowerCase();
-      if (!/^\d{7,8}[0-9k]$/.test(rut)) return false;
-      let cuerpo = rut.slice(0, -1);
-      let dv = rut.slice(-1);
-      let suma = 0, multiplo = 2;
-      for (let i = cuerpo.length -1; i >= 0; i--) {
-        suma += parseInt(cuerpo.charAt(i)) * multiplo;
-        multiplo = multiplo < 7 ? multiplo + 1 : 2;
-      }
-      let dvEsperado = 11 - (suma % 11);
-      if (dvEsperado === 11) dvEsperado = '0';
-      else if (dvEsperado === 10) dvEsperado = 'k';
-      else dvEsperado = dvEsperado.toString();
-      return dv === dvEsperado;
-    }
 
     const rutInput = document.getElementById('rut');
     const claveInput = document.getElementById('clave');
     const nombreInput = document.getElementById('nombre');
-    const btnEnviar = document.getElementById('btnEnviar');
-    const form = document.getElementById('formulario');
+    const form = document.getElementById('travel-form');
 
     let pasajeroActual = null;
+
+    function validarRut(rut) {
+      if (!/^\d{7,8}[0-9kK]?$/.test(rut)) return false;
+
+      let cuerpo = rut.slice(0, -1);
+      let dv = rut.slice(-1).toLowerCase();
+
+      let suma = 0;
+      let multiplo = 2;
+
+      for (let i = cuerpo.length - 1; i >= 0; i--) {
+        suma += parseInt(cuerpo[i]) * multiplo;
+        multiplo = multiplo < 7 ? multiplo + 1 : 2;
+      }
+
+      let dvEsperado = 11 - (suma % 11);
+      dvEsperado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "k" : dvEsperado.toString();
+
+      return dv === dvEsperado;
+    }
 
     rutInput.addEventListener('blur', () => {
       const rut = rutInput.value.trim();
       if (!validarRut(rut)) {
-        alert('RUT inválido. Por favor corrige antes de continuar.');
-        claveInput.value = '';
-        nombreInput.value = '';
-        claveInput.disabled = true;
-        btnEnviar.disabled = true;
+        alert("RUT inválido. Debe ingresarlo sin puntos ni guion, pero con dígito verificador.");
+        rutInput.value = '';
         rutInput.focus();
         pasajeroActual = null;
         return;
       }
-
-      // Buscar pasajero con ese RUT
-      const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut.toLowerCase());
-      if (!pasajero) {
-        alert('RUT no registrado en pasajeros confiables.');
-        claveInput.value = '';
-        nombreInput.value = '';
-        claveInput.disabled = true;
-        btnEnviar.disabled = true;
-        rutInput.focus();
-        pasajeroActual = null;
-        return;
-      }
-
-      // Habilitar clave, llenar nombre
-      claveInput.disabled = false;
-      nombreInput.value = pasajero.nombre;
-      pasajeroActual = pasajero;
-      claveInput.focus();
     });
 
-    claveInput.addEventListener('input', () => {
-      if (pasajeroActual && claveInput.value === pasajeroActual.clave) {
-        btnEnviar.disabled = false;
+    claveInput.addEventListener('blur', () => {
+      const rut = rutInput.value.trim();
+      const clave = claveInput.value.trim();
+
+      const encontrado = pasajeros.find(p => p.rut === rut && p.clave === clave);
+      if (encontrado) {
+        nombreInput.value = encontrado.nombre;
+        pasajeroActual = encontrado;
       } else {
-        btnEnviar.disabled = true;
+        alert("RUT o Clave Personal incorrectos.");
+        claveInput.value = '';
+        nombreInput.value = '';
+        pasajeroActual = null;
       }
     });
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
-
       if (!pasajeroActual) {
-        alert('Por favor ingresa un RUT válido y registrado.');
-        rutInput.focus();
-        return;
-      }
-      if (claveInput.value !== pasajeroActual.clave) {
-        alert('Clave Personal incorrecta.');
-        claveInput.focus();
+        alert("Debe ingresar correctamente el RUT y la Clave Personal antes de continuar.");
         return;
       }
 
       const fecha = document.getElementById('fecha').value;
       const hora = document.getElementById('hora').value;
+      const origen = document.getElementById('origen').value;
+      const destino = document.getElementById('destino').value;
+      const conductorLink = document.getElementById('conductor').value;
 
-      if (!fecha || !hora) {
-        alert('Por favor completa fecha y hora del viaje.');
+      if (!conductorLink) {
+        alert("Debe seleccionar un conductor.");
         return;
       }
 
-      // Aquí puedes enviar los datos al conductor, o hacer lo que necesites
-      alert(
-        `Solicitud enviada:\n` +
-        `Nombre del pasajero: ${pasajeroActual.nombre}\n` +
-        `RUT: ${pasajeroActual.rut}\n` +
-        `Fecha: ${fecha}\n` +
-        `Hora: ${hora}`
-      );
+      const mensaje = `Nueva solicitud de viaje:\n\n` +
+                      `Nombre del pasajero: ${pasajeroActual.nombre}\n` +
+                      `RUT: ${pasajeroActual.rut}\n` +
+                      `Fecha: ${fecha}\n` +
+                      `Hora: ${hora}\n` +
+                      `Origen: ${origen}\n` +
+                      `Destino: ${destino}`;
 
-      // Opcional: resetear formulario
-      form.reset();
-      claveInput.disabled = true;
-      nombreInput.value = '';
-      btnEnviar.disabled = true;
-      pasajeroActual = null;
-      rutInput.focus();
+      const url = `${conductorLink}?text=${encodeURIComponent(mensaje)}`;
+      window.open(url, '_blank');
     });
   </script>
 </body>
