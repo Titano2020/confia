@@ -122,15 +122,15 @@
 </form>
 
 <script>
-  // Lista de pasajeros confiables: rut sin puntos ni guion, clave y nombre.
+  // Pasajeros confiables: RUT sin puntos ni guion, clave y nombre
   const pasajeros = [
-    { rut: '123456785', clave: 'Cristian1', nombre: 'Cristián González' }, // RUT válido ejemplo
-    { rut: '987654321', clave: 'JuanP2', nombre: 'Juan Pérez' },          // RUT válido ejemplo
-    { rut: '111111114', clave: 'MariaL3', nombre: 'María López' }         // RUT válido ejemplo
+    { rut: '123456785', clave: 'Cristian1', nombre: 'Cristián González' },
+    { rut: '987654321', clave: 'JuanP2', nombre: 'Juan Pérez' },
+    { rut: '111111114', clave: 'MariaL3', nombre: 'María López' }
   ];
 
   function validarRut(rut) {
-    if (!/^\d{7,8}[0-9kK]{1}$/.test(rut)) return false; 
+    if (!/^\d{7,8}[0-9kK]{1}$/.test(rut)) return false;
     let cuerpo = rut.slice(0, -1);
     let dv = rut.slice(-1).toLowerCase();
 
@@ -155,58 +155,97 @@
   const errorClave = document.getElementById('errorClave');
   const form = document.getElementById('solicitudForm');
 
-  function limpiarErrores() {
+  // Validar el RUT al perder foco (blur)
+  rutInput.addEventListener('blur', () => {
     errorRut.textContent = '';
-    errorClave.textContent = '';
-  }
+    nombreInput.value = '';
+    if (!validarRut(rutInput.value.trim().toLowerCase())) {
+      errorRut.textContent = 'RUT inválido o con formato incorrecto.';
+    } else {
+      // Si RUT válido pero no está en lista, también error
+      const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rutInput.value.trim().toLowerCase());
+      if (!pasajero) {
+        errorRut.textContent = 'RUT no registrado.';
+      }
+    }
+  });
 
-  function validarDatos() {
-    limpiarErrores();
+  // Validar clave personal y llenar nombre al perder foco o al escribir (input)
+  claveInput.addEventListener('input', () => {
+    errorClave.textContent = '';
+    nombreInput.value = '';
     const rut = rutInput.value.trim().toLowerCase();
     const clave = claveInput.value.trim();
-    nombreInput.value = '';
 
-    if (!validarRut(rut)) {
-      errorRut.textContent = 'RUT inválido o con formato incorrecto.';
-      return false;
+    if (validarRut(rut)) {
+      const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut);
+      if (pasajero) {
+        if (clave === pasajero.clave) {
+          nombreInput.value = pasajero.nombre;
+          errorClave.textContent = '';
+          errorRut.textContent = '';
+        } else if(clave.length > 0) {
+          errorClave.textContent = 'Clave Personal incorrecta.';
+        } else {
+          errorClave.textContent = '';
+        }
+      }
     }
+  });
 
-    const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut);
-
-    if (!pasajero) {
-      errorRut.textContent = 'RUT no registrado.';
-      return false;
-    }
-
-    if (pasajero.clave !== clave) {
-      errorClave.textContent = 'Clave Personal incorrecta.';
-      return false;
-    }
-
-    nombreInput.value = pasajero.nombre;
-    return true;
-  }
-
-  claveInput.addEventListener('input', validarDatos);
-
+  // Al cambiar rut, limpiar errores y nombre
   rutInput.addEventListener('input', () => {
+    errorRut.textContent = '';
+    errorClave.textContent = '';
     nombreInput.value = '';
-    limpiarErrores();
   });
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    if (!validarDatos()) {
-      alert('Por favor corrige los errores antes de enviar.');
+    errorRut.textContent = '';
+    errorClave.textContent = '';
+
+    const rut = rutInput.value.trim().toLowerCase();
+    const clave = claveInput.value.trim();
+
+    if (!validarRut(rut)) {
+      errorRut.textContent = 'RUT inválido o con formato incorrecto.';
+      rutInput.focus();
       return;
     }
 
+    const pasajero = pasajeros.find(p => p.rut.toLowerCase() === rut);
+    if (!pasajero) {
+      errorRut.textContent = 'RUT no registrado.';
+      rutInput.focus();
+      return;
+    }
+
+    if (clave !== pasajero.clave) {
+      errorClave.textContent = 'Clave Personal incorrecta.';
+      claveInput.focus();
+      return;
+    }
+
+    // Ya que todo ok, llenar nombre por seguridad y seguir
+    nombreInput.value = pasajero.nombre;
+
+    // Recoger otros datos para armar mensaje
     const nombre = nombreInput.value;
-    const telefono = document.getElementById('telefono').value.trim();
+    const telefonoConductor = document.getElementById('conductor').value;
+    if (!telefonoConductor) {
+      alert('Por favor selecciona un conductor.');
+      return;
+    }
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
-    const conductorTelefono = document.getElementById('conductor').value;
 
+    if (!origen || !destino) {
+      alert('Por favor completa origen y destino.');
+      return;
+    }
+
+    // Construir mensaje WhatsApp
     const mensaje = encodeURIComponent(
       `Hola, soy ${nombre}.\n` +
       `Solicito un viaje desde: ${origen}\n` +
@@ -214,7 +253,7 @@
       `Por favor confirmar disponibilidad. Gracias.`
     );
 
-    const urlWhatsApp = `https://wa.me/${conductorTelefono}?text=${mensaje}`;
+    const urlWhatsApp = `https://wa.me/${telefonoConductor}?text=${mensaje}`;
     window.open(urlWhatsApp, '_blank');
   });
 </script>
