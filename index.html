@@ -88,6 +88,12 @@
   <label for="nombre">Nombre completo:</label>
   <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
 
+  <label for="rut">RUT (sin puntos, con guion):</label>
+  <input type="text" id="rut" name="rut" placeholder="12345678-9" required />
+
+  <label for="codigo">Código personal:</label>
+  <input type="text" id="codigo" name="codigo" placeholder="Tu código" required />
+
   <label for="telefono">Teléfono (con código país):</label>
   <input type="tel" id="telefono" name="telefono" placeholder="+56912345678" required />
 
@@ -105,42 +111,37 @@
     <option value="56987654321">María López</option>
   </select>
 
-  <label for="codigo">Código de pasajero:</label>
-  <input type="text" id="codigo" name="codigo" placeholder="Ingresa tu código" required />
-
   <button type="submit">Enviar solicitud por WhatsApp</button>
 </form>
 
 <script>
-  // Lista de códigos válidos y sus pasajeros asociados
-  const codigosValidos = {
-    "pass123": "Pedro",
-    "maria456": "María",
-    "juan789": "Juan"
+  // Base de datos simple con pasajeros confiables: RUT => Código personal
+  const pasajerosConfiables = {
+    "12345678-9": "codigo123",
+    "98765432-1": "pass456",
+    "11223344-5": "clave789"
   };
 
   document.getElementById('solicitudForm').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const nombre = document.getElementById('nombre').value.trim();
+    const rut = document.getElementById('rut').value.trim();
+    const codigo = document.getElementById('codigo').value.trim();
     const telefono = document.getElementById('telefono').value.trim();
     const origen = document.getElementById('origen').value.trim();
     const destino = document.getElementById('destino').value.trim();
     const conductorTelefono = document.getElementById('conductor').value;
-    const codigo = document.getElementById('codigo').value.trim();
 
-    if (!nombre || !telefono || !origen || !destino || !conductorTelefono || !codigo) {
-      alert('Por favor completa todos los campos.');
-      return;
-    }
-
-    if (!codigosValidos[codigo]) {
-      alert('Código incorrecto o no autorizado');
+    // Validación: que RUT y código coincidan en la base
+    if (!(rut in pasajerosConfiables) || pasajerosConfiables[rut] !== codigo) {
+      alert('RUT o código personal incorrecto. Si eres pasajero confiable, por favor verifica tus datos.');
       return;
     }
 
     const mensaje = 
-      `Hola, soy ${nombre} (pasajero autorizado: ${codigosValidos[codigo]}).%0A` +
+      `Hola, soy ${nombre}.%0A` +
+      `RUT: ${rut}%0A` +
       `Quiero solicitar un viaje desde: ${origen}%0A` +
       `Hasta: ${destino}%0A` +
       `Mi teléfono de contacto es: ${telefono}%0A` +
@@ -151,9 +152,6 @@
     window.open(urlWhatsApp, '_blank');
   });
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
