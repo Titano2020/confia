@@ -1,72 +1,140 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Mi Conductor de Confianza - Cristián González</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f9ff;
-      margin: 0;
-      padding: 20px;
-      color: #333;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 20px;
-      text-align: center;
-    }
-    img {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 15px;
-    }
-    h1 {
-      margin-bottom: 5px;
-      font-size: 1.8em;
-      color: #2a62bc;
-    }
-    .vehicle, .coverage, .hours, .message {
-      margin: 15px 0;
-      font-size: 1.1em;
-    }
-    .whatsapp-button {
-      display: inline-block;
-      background-color: #25D366;
-      color: white;
-      font-weight: bold;
-      padding: 15px 25px;
-      border-radius: 30px;
-      text-decoration: none;
-      font-size: 1.2em;
-      transition: background-color 0.3s ease;
-      margin-top: 20px;
-    }
-    .whatsapp-button:hover {
-      background-color: #1ebe57;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Confía - Solicita tu viaje</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 480px;
+    margin: auto;
+    padding: 10px;
+    background: #f2f2f2;
+  }
+  h1, h2 {
+    text-align: center;
+    color: #004080;
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    font-weight: bold;
+  }
+  input, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  button {
+    margin-top: 20px;
+    width: 100%;
+    background-color: #004080;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #003060;
+  }
+  .conductores {
+    margin-top: 20px;
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+  }
+  .conductor-item {
+    margin-bottom: 10px;
+  }
+  .whatsapp-btn {
+    background: #25d366;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 14px;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <img src="foto.png" alt="Foto de Cristián González" />
-    <h1>Cristián González</h1>
-    <div class="vehicle"><strong>Vehículo:</strong> Citroën C-Elysée blanco           Patente KJ JR 19, sedán</div>
-    <div class="coverage"><strong>Cobertura:</strong> Toda la Quinta Región + Aeropuerto de Santiago</div>
-    <div class="hours"><strong>Horario:</strong> Disponible 24 horas según disponibilidad</div>
-    <div class="message">
-      "Hola, soy Cristián, conductor de confianza con años de experiencia. Siempre puntual y amable. ¡Contáctame para tu próximo viaje!"
-    </div>
-    <a class="whatsapp-button" href="https://wa.me/56920142327" target="_blank" rel="noopener noreferrer">
-      📲 Contactar a Cristián por WhatsApp
-    </a>
+
+<h1>Confía - Servicio de Viajes</h1>
+
+<div class="conductores">
+  <h2>Conductores disponibles</h2>
+  <div class="conductor-item">
+    <strong>Cristián González</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56920142327" target="_blank">WhatsApp</a>
   </div>
+  <div class="conductor-item">
+    <strong>Juan Pérez</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56912345678" target="_blank">WhatsApp</a>
+  </div>
+  <div class="conductor-item">
+    <strong>María López</strong><br />
+    <a class="whatsapp-btn" href="https://wa.me/56987654321" target="_blank">WhatsApp</a>
+  </div>
+</div>
+
+<h2>Solicita tu viaje</h2>
+<form id="solicitudForm">
+  <label for="nombre">Nombre completo:</label>
+  <input type="text" id="nombre" name="nombre" placeholder="Tu nombre" required />
+
+  <label for="telefono">Teléfono (con código país):</label>
+  <input type="tel" id="telefono" name="telefono" placeholder="+56912345678" required />
+
+  <label for="origen">Lugar de partida:</label>
+  <input type="text" id="origen" name="origen" placeholder="Dirección o referencia" required />
+
+  <label for="destino">Destino:</label>
+  <input type="text" id="destino" name="destino" placeholder="Dirección o referencia" required />
+
+  <label for="conductor">Selecciona conductor:</label>
+  <select id="conductor" name="conductor" required>
+    <option value="" disabled selected>-- Elige un conductor --</option>
+    <option value="56920142327">Cristián González</option>
+    <option value="56912345678">Juan Pérez</option>
+    <option value="56987654321">María López</option>
+  </select>
+
+  <button type="submit">Enviar solicitud por WhatsApp</button>
+</form>
+
+<script>
+  document.getElementById('solicitudForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const origen = document.getElementById('origen').value.trim();
+    const destino = document.getElementById('destino').value.trim();
+    const conductorTelefono = document.getElementById('conductor').value;
+
+    if (!nombre || !telefono || !origen || !destino || !conductorTelefono) {
+      alert('Por favor completa todos los campos.');
+      return;
+    }
+
+    const mensaje = 
+      `Hola, soy ${nombre}.%0A` +
+      `Quiero solicitar un viaje desde: ${origen}%0A` +
+      `Hasta: ${destino}%0A` +
+      `Mi teléfono de contacto es: ${telefono}%0A` +
+      `Por favor confirma tu disponibilidad. ¡Gracias!`;
+
+    const urlWhatsApp = `https://wa.me/${conductorTelefono}?text=${mensaje}`;
+
+    window.open(urlWhatsApp, '_blank');
+  });
+</script>
+
 </body>
 </html>
