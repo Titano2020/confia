@@ -10,9 +10,36 @@
       margin: 20px;
       background: #f4f4f4;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
       color: #333;
+    }
+    .conductores {
+      max-width: 480px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+      color: #333;
+    }
+    .conductores h2 {
+      margin-top: 0;
+    }
+    .conductores ul {
+      list-style: none;
+      padding-left: 0;
+    }
+    .conductores li {
+      padding: 6px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .form-title {
+      text-align: center;
+      font-size: 18px;
+      color: #222;
+      margin-bottom: 10px;
+      font-weight: 600;
     }
     form {
       background: #fff;
@@ -51,33 +78,11 @@
     button:hover {
       background-color: #005fa3;
     }
-    .conductores {
-      max-width: 480px;
-      margin: 20px auto;
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-      color: #333;
-    }
-    .conductores h2 {
-      margin-top: 0;
-      text-align: center;
-    }
-    .conductores ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    .conductores li {
-      padding: 6px 0;
-      border-bottom: 1px solid #ddd;
-    }
-    .form-title {
-      text-align: center;
-      font-size: 18px;
-      color: #222;
-      margin-bottom: 10px;
-      font-weight: 600;
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 6px;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -89,9 +94,10 @@
     <h2>Conductores disponibles</h2>
     <ul>
       <li>Cristián González</li>
-      <li>Martha Chapa</li>
-      <li>Pamela Lemus</li>
-     
+      <li>María López</li>
+      <li>Javier Fernández</li>
+      <li>Carolina Méndez</li>
+      <li>Andrés Rojas</li>
     </ul>
   </div>
 
@@ -103,6 +109,8 @@
 
     <label for="clave">Clave Personal:</label>
     <input type="password" id="clave" name="clave" required />
+
+    <div class="error" id="errorMensaje"></div>
 
     <label for="nombre">Nombre del pasajero:</label>
     <input type="text" id="nombre" name="nombre" readonly />
@@ -116,22 +124,24 @@
     <label for="fecha">Fecha del viaje:</label>
     <input type="date" id="fecha" name="fecha" required />
 
-    <label for="hora">Hora del viaje (24 horas):</label>
+    <label for="hora">Hora del viaje (formato 24 hrs):</label>
     <input type="time" id="hora" name="hora" required />
 
     <label for="conductor">Elegir conductor:</label>
     <select id="conductor" name="conductor" required>
       <option value="">--Seleccione un conductor--</option>
       <option value="Cristián González">Cristián González</option>
-      <option value="Martha Chapa">Martha Chapa</option>
-      <option value="Pamela Lemus">Pamela Lemus</option>
-      
+      <option value="María López">María López</option>
+      <option value="Javier Fernández">Javier Fernández</option>
+      <option value="Carolina Méndez">Carolina Méndez</option>
+      <option value="Andrés Rojas">Andrés Rojas</option>
     </select>
 
     <button type="submit">Enviar Solicitud</button>
   </form>
 
   <script>
+    // ---------- 1. Configuración de Pasajeros y Conductores ----------
     const pasajeros = [
       { rut: "123456785", clave: "Clave123", nombre: "Juan Pérez" },
       { rut: "987654321", clave: "Segura1", nombre: "Ana Gómez" },
@@ -139,57 +149,73 @@
       { rut: "556677889", clave: "Clave999", nombre: "Carla Díaz" }
     ];
 
+    // Números WhatsApp de los conductores (reemplaza con +56... si deseas SMS web)
     const numerosConductores = {
-      "Cristián González": "56920142327",
-      "Martha Chapa": "56987654321",
-      "Pamela Lemus": "56911223344",
-      
+      "Cristián González": "56912345678",
+      "María López":      "56987654321",
+      "Javier Fernández":  "56911223344",
+      "Carolina Méndez":   "56944332211",
+      "Andrés Rojas":      "56999887766"
     };
 
-    const rutInput = document.getElementById("rut");
-    const claveInput = document.getElementById("clave");
+    // URL del Apps Script (reemplaza TU_SCRIPT_URL_AQUÍ con tu URL real)
+    const sheetScriptURL = "TU_SCRIPT_URL_AQUÍ";
+
+    // ---------- 2. Referencias en el DOM ----------
+    const rutInput    = document.getElementById("rut");
+    const claveInput  = document.getElementById("clave");
     const nombreInput = document.getElementById("nombre");
-    const form = document.getElementById("viajeForm");
+    const errorMensaje = document.getElementById("errorMensaje");
+    const form        = document.getElementById("viajeForm");
 
-    rutInput.addEventListener("input", () => {
-      nombreInput.value = "";
-    });
-    claveInput.addEventListener("input", () => {
-      nombreInput.value = "";
-    });
-
+    // ---------- 3. Validación de Pasajero (RUT + Clave) ----------
     function validarPasajero() {
-      const rut = rutInput.value.trim();
+      const rut   = rutInput.value.trim();
       const clave = claveInput.value.trim();
-      const pasajero = pasajeros.find(
-        p => p.rut === rut && p.clave === clave
-      );
+      const pasajero = pasajeros.find(p => p.rut === rut && p.clave === clave);
+
       if (pasajero) {
         nombreInput.value = pasajero.nombre;
-        return true;
+        errorMensaje.textContent = "";
+        return pasajero;  // Devuelve el objeto pasajero
       } else {
         nombreInput.value = "";
-        return false;
+        errorMensaje.textContent = "RUT o Clave Personal incorrecta.";
+        return null;
       }
     }
 
+    // ---------- 4. Eventos para autollenar el nombre ----------
+    rutInput.addEventListener("input", () => {
+      nombreInput.value = "";
+      errorMensaje.textContent = "";
+    });
+    claveInput.addEventListener("input", () => {
+      nombreInput.value = "";
+      errorMensaje.textContent = "";
+    });
     rutInput.addEventListener("blur", validarPasajero);
     claveInput.addEventListener("blur", validarPasajero);
 
-    form.addEventListener("submit", (e) => {
+    // ---------- 5. Envío del Formulario ----------
+    form.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      if (!validarPasajero()) {
-        alert("RUT o Clave Personal incorrectos. No se enviará la solicitud.");
+      // 5.1 Validar pasajero
+      const pasajero = validarPasajero();
+      if (!pasajero) {
+        alert("Verifica el RUT y la Clave Personal antes de continuar.");
         return;
       }
 
-      const rut = rutInput.value.trim();
-      const nombre = nombreInput.value.trim();
-      const origen = document.getElementById("origen").value.trim();
-      const destino = document.getElementById("destino").value.trim();
-      const fecha = document.getElementById("fecha").value;
-      const hora = document.getElementById("hora").value;
+      // 5.2 Recoger datos del formulario
+      const rut       = rutInput.value.trim();
+      const nombre    = pasajero.nombre;
+      const clave     = claveInput.value.trim();
+      const origen    = document.getElementById("origen").value.trim();
+      const destino   = document.getElementById("destino").value.trim();
+      const fecha     = document.getElementById("fecha").value;
+      const hora      = document.getElementById("hora").value;
       const conductor = document.getElementById("conductor").value;
 
       if (!conductor) {
@@ -197,27 +223,51 @@
         return;
       }
 
-      const mensaje =
-        `Solicitud de viaje segura:\n` +
-        `Nombre del pasajero: ${nombre}\n` +
-        `RUT: ${rut}\n` +
-        `Origen: ${origen}\n` +
-        `Destino: ${destino}\n` +
-        `Fecha: ${fecha}\n` +
-        `Hora: ${hora}\n` +
-        `Conductor solicitado: ${conductor}`;
+      // 5.3 Construir mensaje para Sheet y WhatsApp
+      const datosParaSheet = {
+        nombre: nombre,
+        rut: rut,
+        clave: clave,
+        origen: origen,
+        destino: destino,
+        fecha: fecha,
+        hora: hora,
+        conductor: conductor
+      };
 
+      const mensajeWhatsApp =
+        `🚖 *Nueva solicitud de viaje*\n` +
+        `📌 *Nombre del pasajero:* ${nombre}\n` +
+        `🆔 *RUT:* ${rut}\n` +
+        `📍 *Origen:* ${origen}\n` +
+        `📍 *Destino:* ${destino}\n` +
+        `📅 *Fecha:* ${fecha}\n` +
+        `🕒 *Hora:* ${hora}\n` +
+        `👨‍✈️ *Conductor asignado:* ${conductor}`;
+
+      // 5.4 Enviar datos a Google Sheets mediante POST
+      fetch(sheetScriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams(datosParaSheet)
+      }).catch(err => {
+        console.warn("Fallo al registrar en Google Sheets:", err);
+      });
+
+      // 5.5 Abrir WhatsApp con el mensaje al conductor elegido
       const numeroConductor = numerosConductores[conductor];
       if (!numeroConductor) {
         alert("Número de conductor no encontrado.");
         return;
       }
-
-      const urlWhatsApp = `https://wa.me/${numeroConductor}?text=${encodeURIComponent(mensaje)}`;
+      const urlWhatsApp = `https://wa.me/${numeroConductor}?text=${encodeURIComponent(mensajeWhatsApp)}`;
       window.open(urlWhatsApp, "_blank");
 
-      alert("Se ha abierto WhatsApp con el mensaje listo para enviar al conductor.");
-
+      // 5.6 Confirmación visual y limpieza del formulario
+      alert("Se ha abierto WhatsApp con el mensaje listo para enviar al conductor.\n\nAdemás, tu solicitud se está registrando en la planilla.");
       form.reset();
       nombreInput.value = "";
     });
